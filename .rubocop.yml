@@ -1,0 +1,57 @@
+require:
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 2.7
+  TargetRailsVersion: 6.1
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - '**/db/migrate/*'
+    - '**/Gemfile.lock'
+    - '**/Rakefile'
+    - '**/rails'
+    - '**/vendor/**/*'
+    - '**/spec_helper.rb'
+    - 'node_modules/**/*'
+    - 'config/**/*'
+    - 'config.ru'
+    - 'bin/*'
+    - 'db/*'
+
+# ============== Style ================
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/GlobalStdStream:
+  Enabled: false
+
+Style/RedundantFetchBlock:
+  Enabled: false
+
+# ============== Layout =================
+
+Layout/LineLength:
+  Max: 120
+
+# ============== Metric =================
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 30
+
+# ============== Rails =================
+
+Rails/FilePath:
+  Enabled: false
+
+# ============== Lint =================
+
+Lint/MissingSuper:
+  Enabled: false

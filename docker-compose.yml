@@ -1,0 +1,43 @@
+version: '3.1'
+
+volumes:
+  postgres:
+
+services:
+  db:
+    image: postgres:10
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rails_application_development
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+
+  server_app: &server_app
+    build: .
+    command: bundle exec rails server -b 0.0.0.0
+    entrypoint: "./entrypoint.sh"
+    volumes:
+      - .:/app
+    tty: true
+    stdin_open: true
+    restart: on-failure
+    environment:
+      RAILS_ENV: development
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: rails_application_development
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      SECRET_KEY_BASE: STUB
+      DEVISE_SECRET_KEY: STUB
+    depends_on:
+      - db
+    ports:
+      - 3000:80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
