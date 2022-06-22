@@ -10,6 +10,5 @@ Program a model of a vending machine. It should at least satisfy the following r
 * Dispenses change after making a purchase
 * Has a cancel button that returns the user’s money
 * Ability to stock/restock items in the machine
-* Any other functionality that you think a vending machine should have!
 ---
 To run test type `rspec` in console
