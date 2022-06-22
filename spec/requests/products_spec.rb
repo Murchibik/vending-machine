@@ -35,6 +35,13 @@ RSpec.describe "/products", type: :request do
     end
   end
 
+  describe 'PATCH /restock' do
+    it 'renders a successful response' do
+      patch new_product_url
+      expect(response).to be_successful
+    end
+  end
+
   describe 'GET /new' do
     it 'renders a successful response' do
       get new_product_url

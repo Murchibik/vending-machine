@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :product, only: %i[edit update destroy ]
+  before_action :product, only: %i[edit update destroy restock]
 
   # GET /products or /products.json
   def index
@@ -13,6 +13,13 @@ class ProductsController < ApplicationController
 
   # GET /products/1/edit
   def edit
+  end
+
+  # POST /products/1/restock
+  def restock
+    stock = product.stock_record
+    quantity = stock.quantity
+    stock.update(quantity: quantity + params.permit(:quantity)[:quantity].to_i)
   end
 
   # POST /products or /products.json
@@ -46,7 +53,6 @@ class ProductsController < ApplicationController
   # DELETE /products/1 or /products/1.json
   def destroy
     product.destroy
-    debugger
     respond_to do |format|
       format.html { redirect_to products_url, notice: "Product was successfully destroyed." }
       format.json { head :no_content }
@@ -55,11 +61,11 @@ class ProductsController < ApplicationController
 
   private
 
-    def product
-      @product ||= Product.find(params.permit(:id)[:id])
-    end
+  def product
+    @product ||= Product.find(params.permit(:id)[:id])
+  end
 
-    def product_params
-      params.require(:product).permit(:name, :code, :price)
-    end
+  def product_params
+    params.require(:product).permit(:name, :code, :price)
+  end
 end

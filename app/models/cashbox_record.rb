@@ -3,5 +3,5 @@ class CashboxRecord < ApplicationRecord
 
   validates :amount, numericality: { greater_than: 0 }
 
-  enum transaction_direction: { income: 0, outcome: 1 }
+  enum transaction_direction: { income: 0, refund: 1 }
 end
