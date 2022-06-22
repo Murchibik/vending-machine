@@ -1,33 +1,41 @@
 class HomeController < ApplicationController
   before_action :deposit
 
+  # POST /input
   def input
-    amount = params.permit(:amount)
-    validate_amount!(amount)
-    deposit.update(amount: deposit.amount + amount)
-    session[:input_amount] = deposit.amount
+    amount = params.permit(:amount)[:amount]
+    deposit_service = ChangeDepositService.new(amount, deposit)
+    deposit_service.call
   end
 
+  # PATCH /cancel
   def cancel
-    @amount = session[:input_amount]
-    session[:input_amount] = 0
+    @change = deposit.amount
     deposit.update(amount: 0)
-    @amount
+    @balance = 0
+    check_deposit!
   end
 
+  # GET /balance
   def my_balance
-    session[:input_amount]
+    @balance = deposit.amount
   end
 
+  # POST /pick
   def pick
-    MakePickService.perform(params.permit(:code)[:code].to_i, deposit)
+    service = MakePickService.new(params.permit(:code)[:code].to_i, deposit)
+    result = service.call
+    @product = result[:product]
+    @change = result[:change]
+    @balance = deposit.amount
+    check_deposit!
   end
 
   private
 
   def deposit
     @deposit = if session[:deposit_id].blank?
-                 UserDeposit.create!(amount: 0)
+                 UserDeposit.create(amount: 0)
                else
                  UserDeposit.find(session[:deposit_id])
                end
@@ -35,7 +43,10 @@ class HomeController < ApplicationController
     @deposit
   end
 
-  def validate_amount!(amount)
-    raise StandardError, 'Incorrect amount' if amount <= 0
+  def check_deposit!
+    return unless deposit.amount.zero?
+
+    deposit.destroy
+    session[:deposit_id] = nil
   end
 end

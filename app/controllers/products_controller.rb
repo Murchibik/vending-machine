@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :product, only: %i[edit update destroy restock]
+  before_action :product, only: %i[edit update destroy]
 
   # GET /products or /products.json
   def index
@@ -17,9 +17,9 @@ class ProductsController < ApplicationController
 
   # POST /products/1/restock
   def restock
-    stock = product.stock_record
-    quantity = stock.quantity
-    stock.update(quantity: quantity + params.permit(:quantity)[:quantity].to_i)
+    restock_params = params.permit(:product_id, :quantity)
+    restock_engine = RestockService.new(restock_params[:product_id], restock_params[:quantity])
+    restock_engine.call
   end
 
   # POST /products or /products.json
@@ -28,7 +28,7 @@ class ProductsController < ApplicationController
 
     respond_to do |format|
       if @product.save
-        format.html { redirect_to product_url(@product), notice: "Product was successfully created." }
+        format.html { redirect_to products_url, notice: "Product was successfully created." }
         format.json { render :show, status: :created, location: @product }
       else
         format.html { render :new, status: :unprocessable_entity }

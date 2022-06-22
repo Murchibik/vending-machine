@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "/products", type: :request do
+RSpec.describe 'ProductsController', type: :request do
 
   let(:valid_attributes) { { name: 'Cookies', code: 1, price: 15 } }
   let(:invalid_attributes) { { name: '', code: 1, price: -2 } }
@@ -36,9 +36,48 @@ RSpec.describe "/products", type: :request do
   end
 
   describe 'PATCH /restock' do
-    it 'renders a successful response' do
-      patch new_product_url
-      expect(response).to be_successful
+    let!(:product) { create(:product, :single) }
+    context 'when add products' do
+      it 'renders a successful response' do
+        patch product_restock_url(product), params: { quantity: 1 }
+        expect(response).to be_successful
+      end
+
+      it 'should increase stock' do
+        patch product_restock_url(product), params: { quantity: 1 }
+        product.reload
+        expect(product.stock_record.quantity).to eq(2)
+      end
+    end
+
+    context 'when remove products' do
+      it 'should decrease stock' do
+        patch product_restock_url(product), params: { quantity: -1 }
+        product.reload
+        expect(product.stock_record.quantity).to eq(0)
+      end
+    end
+
+    context 'when decrease quantity lower than available' do
+      it 'should raise an error' do
+        expect {
+          patch product_restock_url(product), params: { quantity: -5 }
+        }.to raise_error(StandardError, 'After update stock should not be negative')
+      end
+    end
+
+    context 'when quantity is zero or incorrect' do
+      it 'should raise an error' do
+        expect {
+          patch product_restock_url(product), params: { quantity: 0 }
+        }.to raise_error(StandardError, 'Stock will not change')
+      end
+
+      it 'should raise error' do
+        expect {
+          patch product_restock_url(product), params: { quantity: 'quantity' }
+        }.to raise_error(StandardError, 'Stock will not change')
+      end
     end
   end
 

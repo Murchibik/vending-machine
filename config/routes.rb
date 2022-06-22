@@ -1,8 +1,6 @@
 Rails.application.routes.draw do
   resources :products, except: %i[show] do
-    collection do
-      post '/restock', to: 'products#restock'
-    end
+    patch '/restock', to: 'products#restock'
   end
 
   get '/balance', to: 'home#my_balance'
